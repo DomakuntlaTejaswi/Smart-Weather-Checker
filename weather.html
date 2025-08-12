@@ -1,0 +1,168 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Smart Weather Checker</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style type="text/css">
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .weather-app {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      width: 320px;
+      padding: 30px 25px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .weather-app:hover {
+      transform: scale(1.03);
+    }
+
+    h1 {
+      margin-bottom: 25px;
+      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      box-shadow: 0 0 10px #ffcc00;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 0;
+      background-color: #ffcc00;
+      border: none;
+      border-radius: 8px;
+      color: #333;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 204, 0, 0.5);
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e6b800;
+    }
+
+    .result {
+      margin-top: 25px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .result p {
+      margin: 8px 0;
+      text-transform: capitalize;
+    }
+
+    .error-msg {
+      margin-top: 20px;
+      color: #ffcc00;
+      font-weight: 600;
+      font-size: 1rem;
+      text-shadow: 0 0 5px #ffcc00;
+    }
+  </style>
+</head>
+<body>
+  <div class="weather-app">
+    <h1>Smart Weather Checker</h1>
+    <input type="text" id="cityInput" placeholder="Type city name here..." />
+    <button id="searchBtn">Get Weather</button>
+
+    <div id="weatherResult" class="result"></div>
+    <div id="errorMsg" class="error-msg"></div>
+  </div>
+
+  <script type="text/javascript">
+    var apiKey = '7e19b021d96dca1f317667d859b24efa';
+
+    var cityInput = document.getElementById('cityInput');
+    var searchBtn = document.getElementById('searchBtn');
+    var weatherResult = document.getElementById('weatherResult');
+    var errorMsg = document.getElementById('errorMsg');
+
+    function fetchWeather(city) {
+      var endpoint = 'https://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(city) + '&appid=' + apiKey + '&units=metric';
+
+      fetch(endpoint)
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error('City not found. Please check the spelling.');
+          }
+          return response.json();
+        })
+        .then(function(data) {
+          displayWeather(data);
+        })
+        .catch(function(error) {
+          displayError(error.message);
+        });
+    }
+
+    function displayWeather(data) {
+      errorMsg.innerHTML = '';
+      weatherResult.innerHTML = '' +
+        '<p><strong>' + data.name + ', ' + data.sys.country + '</strong></p>' +
+        '<p>🌡 Temperature: <strong>' + data.main.temp + '°C</strong></p>' +
+        '<p>🌥 Condition: <strong>' + data.weather[0].description + '</strong></p>' +
+        '<p>💧 Humidity: <strong>' + data.main.humidity + '%</strong></p>' +
+        '<p>💨 Wind Speed: <strong>' + data.wind.speed + ' m/s</strong></p>';
+    }
+
+    function displayError(message) {
+      weatherResult.innerHTML = '';
+      errorMsg.innerHTML = message;
+    }
+
+    searchBtn.onclick = function() {
+      var city = cityInput.value.replace(/^\s+|\s+$/g, '');
+      if (city === '') {
+        displayError('Please enter a city name to search.');
+        return;
+      }
+      fetchWeather(city);
+    };
+
+    cityInput.onkeypress = function(e) {
+      if (e.key === 'Enter') {
+        searchBtn.click();
+      }
+    };
+  </script>
+</body>
+</html>
+
